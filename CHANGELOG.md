@@ -1,5 +1,11 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2024/12/13|      |Release 2.27.0                                                                                           |
+|2026/03/04|      |Switch from puppet to openvox gem                                                                        |
+|2025/07/24|211   |Remove unexpected require from the gemfile                                                               |
+|2025/07/24|211   |Get dependencies from the gemfile                                                                        |
+|2025/07/24|211   |Adjust the gemspec name                                                                                  |
+|2025/03/08|205   |Fix running tasks as another user                                                                        |
 |2024/12/13|      |Release 2.26.5                                                                                           |
 |2024/12/10|202   |Pass federations properly down from choria playbooks                                                     |
 |2024/09/01|      |Release 2.26.4                                                                                           |
