@@ -4,7 +4,6 @@ gem 'mocha'
 
 require 'rspec'
 require 'mcollective'
-require 'ostruct'
 require 'tmpdir'
 require 'tempfile'
 require 'mcollective/test'

@@ -14,9 +14,19 @@ describe OpenSSL::SSL::SSLContext do
 
   it 'explicitly disable SSLv2 ciphers using the ! prefix so they cannot be re-added' do
     if OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
-      cipher_str = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:ciphers]
-      expect(cipher_str.split(':')).to include('!SSLv2')
+      described_class.any_instance.expects(:set_params).with { |params| params[:ciphers].split(':').include?('!SSLv2') }
+      subject
     end
+  end
+
+  it 'leaves the openssl default parameters untouched' do
+    defaults = OpenSSL::SSL::SSLContext::DEFAULT_PARAMS
+    expect(defaults[:options] & OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS).to eq(0)
+    expect(defaults[:ciphers].to_s.split(':')).not_to include('!SSLv2')
+  end
+
+  it 'keeps empty fragments enabled via the SSLContext#options bitmask' do
+    expect(subject.options & OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS).to eq(OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS)
   end
 
   it 'has no ciphers with version SSLv2 enabled' do
