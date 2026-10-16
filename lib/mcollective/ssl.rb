@@ -196,8 +196,11 @@ module MCollective
 
     def self.base64_decode(string)
       # The Base 64 character set is A-Z a-z 0-9 + / =
-      # Also allow for whitespace, but raise if we get anything else
-      raise(ArgumentError, "invalid base64") if string !~ /^[A-Za-z0-9+\/=\s]+$/
+      # Also allow for whitespace, but raise if we get anything else.
+      # String#count checks a megabyte in well under a millisecond where
+      # a regex over the whole string took tens of milliseconds and a
+      # backtrack stack of its own size.
+      raise(ArgumentError, "invalid base64") if string.empty? || string.count("^A-Za-z0-9+/= \t\r\n\f\v") > 0
 
       Base64.decode64(string)
     end
