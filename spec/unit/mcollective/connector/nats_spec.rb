@@ -352,6 +352,31 @@ module MCollective
 
         connector.publish_connected_directed(msg)
       end
+
+      it "should publish the same serialized message to every node with the reply target" do
+        msg.collective = "mcollective"
+        msg.agent = "rspec_agent"
+        msg.discovered_hosts = ["rspec1", "rspec2"]
+        msg.type = :direct_request
+
+        published = []
+        connector.connection.stubs(:publish).with do |target, data, reply|
+          published << [target, data, reply]
+          true
+        end
+
+        connector.publish_connected_directed(msg)
+
+        reply_target = connector.make_target("rspec_agent", :reply, "mcollective")
+        expect(published.map(&:first)).to eq(["mcollective.node.rspec1", "mcollective.node.rspec2"])
+        expect(published.map { |p| p[1] }.uniq.size).to eq(1)
+        expect(published.map(&:last)).to eq([reply_target, reply_target])
+        expect(JSON.parse(published.first[1])).to eq(
+          "protocol" => "choria:transport:1",
+          "data" => msg.payload,
+          "headers" => {"mc_sender" => "rspec_identity", "reply-to" => reply_target}
+        )
+      end
     end
 
     describe "#publish" do
