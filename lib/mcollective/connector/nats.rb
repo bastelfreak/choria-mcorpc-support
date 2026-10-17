@@ -274,17 +274,21 @@ module MCollective
       #
       # @param msg [Message]
       def publish_connected_directed(msg)
+        # The body and the headers are the same for every node, only the
+        # subject differs, so the JSON is built once rather than per node
+        headers = headers_for(msg)
+        data = {
+          "protocol" => "choria:transport:1",
+          "data" => msg.payload,
+          "headers" => headers
+        }.to_json
+
         msg.discovered_hosts.each do |node|
-          target = target_for(msg, node)
-          data = {
-            "protocol" => "choria:transport:1",
-            "data" => msg.payload,
-            "headers" => target[:headers]
-          }
+          target = make_target(msg.agent, msg.type, msg.collective, node)
 
-          Log.debug("Sending a direct message to %s via NATS target '%s' for message type %s" % [node, target.inspect, msg.type])
+          Log.debug("Sending a direct message to %s via NATS target '%s' for message type %s" % [node, target, msg.type])
 
-          connection.publish(target[:name], data.to_json, target[:headers]["reply-to"])
+          connection.publish(target, data, headers["reply-to"])
         end
       end
 
