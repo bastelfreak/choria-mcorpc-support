@@ -8,3 +8,4 @@ tags
 pkg
 .bundle
 .ruby-version
+/.vendor
